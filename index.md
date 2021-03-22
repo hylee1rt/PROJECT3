@@ -292,11 +292,11 @@ Now, let's see if tuning the hyperparameters improve our results even further.
 
 Grid Search is an effective method for adjusting the parameters in supervised learning and improve the generalization performance of a model. With Grid Search, we try all possible combinations of the parameters of interest and find the best ones.
 
-| GridSearchCV                   | Alpha     | Validated MAE      |
+| Model                          | Alpha      | Validated MAE      |
 |--------------------------------|-----------|--------------------|
 | Ridge                          |     6.22  | $2855.70           |                     
 | Lasso                          |      0.03 | $2948.42         |    
-| Elastic Net                    |      0.15 | $3820.86          |   
+| Elastic Net                    |      0.01 | $2846.91          |   
 
 
 
@@ -377,9 +377,14 @@ print("MAE Neural Network = ${:,.2f}".format(1000*mae_nn))
 
 | Model                          |  Validated MAE     |  
 |--------------------------------|--------------------|
-| Kernel Regressions             | $2854.57           |
+| Gaussian Kernel Regression     | $2854.57           |
 | Random Forest Regression       | $2877.17           |
 | XGBoost                        |  $2313.58          |                     
 | Neural Network                 |  $2476.62          |    
+
+
+
+
+
 
 

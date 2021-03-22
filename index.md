@@ -97,6 +97,62 @@ The penalty is defined as:
 ![\begin{cases} \lambda & \text{if } |\beta| \leq \lambda \\ \frac{(a\lambda - \beta)}{(a - 1) } & \text{if } \lambda < |\beta| \leq a \lambda \\ 0 & \text{if } |\beta| > a \lambda \\ \end{cases}
 ](https://render.githubusercontent.com/render/math?math=%5CLarge+%5Cdisplaystyle+%5Cbegin%7Bcases%7D+%5Clambda+%26+%5Ctext%7Bif+%7D+%7C%5Cbeta%7C+%5Cleq+%5Clambda+%5C%5C+%5Cfrac%7B%28a%5Clambda+-+%5Cbeta%29%7D%7B%28a+-+1%29+%7D+%26+%5Ctext%7Bif+%7D+%5Clambda+%3C+%7C%5Cbeta%7C+%5Cleq+a+%5Clambda+%5C%5C+0+%26+%5Ctext%7Bif+%7D+%7C%5Cbeta%7C+%3E+a+%5Clambda+%5C%5C+%5Cend%7Bcases%7D%0A)
 
+```python
+def scad_penalty(beta_hat, lambda_val, a_val):
+    is_linear = (np.abs(beta_hat) <= lambda_val)
+    is_quadratic = np.logical_and(lambda_val < np.abs(beta_hat), np.abs(beta_hat) <= a_val * lambda_val)
+    is_constant = (a_val * lambda_val) < np.abs(beta_hat)
+    
+    linear_part = lambda_val * np.abs(beta_hat) * is_linear
+    quadratic_part = (2 * a_val * lambda_val * np.abs(beta_hat) - beta_hat**2 - lambda_val**2) / (2 * (a_val - 1)) * is_quadratic
+    constant_part = (lambda_val**2 * (a_val + 1)) / 2 * is_constant
+    return linear_part + quadratic_part + constant_part
+    
+def scad_derivative(beta_hat, lambda_val, a_val):
+    return lambda_val * ((beta_hat <= lambda_val) + (a_val * lambda_val - beta_hat)*((a_val * lambda_val - beta_hat) > 0) / ((a_val - 1) * lambda_val) * (beta_hat > lambda_val))
+```
+```python
+def scad_model(X,y,lam,a):
+  n = X.shape[0]
+  p = X.shape[1]
+  def scad(beta):
+    beta = beta.flatten()
+    beta = beta.reshape(-1,1)
+    n = len(y)
+    return 1/n*np.sum((y-X.dot(beta))**2) + np.sum(scad_penalty(beta,lam,a))
+  
+  def dscad(beta):
+    beta = beta.flatten()
+    beta = beta.reshape(-1,1)
+    n = len(y)
+    return np.array(-2/n*np.transpose(X).dot(y-X.dot(beta))+scad_derivative(beta,lam,a)).flatten()
+  b0 = np.ones((p,1))
+  output = minimize(scad, b0, method='L-BFGS-B', jac=dscad,options={'gtol': 1e-8, 'maxiter': 1e7,'maxls': 25,'disp': True})
+  return output.x
+```
+
+```python
+def DoKFoldScad(X,y,lam,a,k):
+  PE = []
+  kf = KFold(n_splits=k,shuffle=True,random_state=1234)
+  for idxtrain, idxtest in kf.split(X):
+    X_train = X[idxtrain,:]
+    X_train_scaled = scale.fit_transform(X_train)
+    X_train_poly = poly.fit_transform(X_train_scaled)
+    y_train = y[idxtrain]
+    X_test  = X[idxtest,:]
+    X_test_scaled = scale.transform(X_test)
+    X_test_poly = poly.fit_transform(X_test_scaled)
+    y_test  = y[idxtest]
+    beta_scad = scad_model(X_train_poly,y_train,lam,a)
+    n = X_test_poly.shape[0]
+    p = X_test_poly.shape[1]
+    yhat_scad = X_test_poly.dot(beta_scad)
+    PE.append(MAE(y_test,yhat_scad))
+  return 1000*np.mean(PE)
+```
+
+
 
 ### Square Root Lasso
 
@@ -106,3 +162,124 @@ The cost function is:
 
 ![\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2}+\alpha\sum_{i=1}^{p}|\beta_i|
 ](https://render.githubusercontent.com/render/math?math=%5CLarge+%5Cdisplaystyle+%5Csqrt%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%28y_i-%5Chat%7By%7D_i%29%5E2%7D%2B%5Calpha%5Csum_%7Bi%3D1%7D%5E%7Bp%7D%7C%5Cbeta_i%7C%0A)
+
+and is implemented as follows:
+
+```python
+def sqrtlasso_model(X,y,alpha):
+  n = X.shape[0]
+  p = X.shape[1]
+  
+  def sqrtlasso(beta):
+    beta = beta.flatten()
+    beta = beta.reshape(-1,1)
+    n = len(y)
+    return np.sqrt(1/n*np.sum((y-X.dot(beta))**2)) + alpha*np.sum(np.abs(beta))
+  
+  def dsqrtlasso(beta):
+    beta = beta.flatten()
+    beta = beta.reshape(-1,1)
+    n = len(y)
+    return np.array((-1/np.sqrt(n))*np.transpose(X).dot(y-X.dot(beta))/np.sqrt(np.sum((y-X.dot(beta))**2))+alpha*np.sign(beta)).flatten()
+  b0 = np.ones((p,1))
+  output = minimize(sqrtlasso, b0, method='L-BFGS-B', jac=dsqrtlasso,options={'gtol': 1e-8, 'maxiter': 1e8,'maxls': 25,'disp': True})
+  return output.x
+```
+
+```python
+def DoKFoldSqrt(X,y,a,k,d):
+  PE = []
+  scale = StandardScaler()
+  poly = PolynomialFeatures(degree=d)
+  kf = KFold(n_splits=k,shuffle=True,random_state=1234)
+  for idxtrain, idxtest in kf.split(X):
+    X_train = X[idxtrain,:]
+    X_train_scaled = scale.fit_transform(X_train)
+    X_train_poly = poly.fit_transform(X_train_scaled)
+    y_train = y[idxtrain]
+    X_test  = X[idxtest,:]
+    X_test_scaled = scale.transform(X_test)
+    X_test_poly = poly.fit_transform(X_test_scaled)
+    y_test  = y[idxtest]
+    beta_sqrt = sqrtlasso_model(X_train_poly,y_train,a)
+    n = X_test_poly.shape[0]
+    p = X_test_poly.shape[1]
+    # we add an extra columns of 1 for the intercept
+    #X1_test = np.c_[np.ones((n,1)),X_test]
+    yhat_sqrt = X_test_poly.dot(beta_sqrt)
+    PE.append(MAE(y_test,yhat_sqrt))
+  return 1000*np.mean(PE)
+```
+
+
+### Stepwise selection
+
+Stepwise selection is a combination of the forward and backward variable selection techniques and was originally developed as a feature selection technique for linear regression models. The forward stepwise regression approach uses a sequence of steps to allow features to be added or dropped one at a time. The add and drop criteria is commonly based on a p-value threshold. Typically, a p-value must be less than 0.15 for a feature to enter the model and must be greater than 0.15 for a feature to leave the model. The function is defined below. 
+
+```python
+def stepwise_selection(X, y, 
+                       initial_list=[], 
+                       threshold_in=0.01, 
+                       threshold_out = 0.05, 
+                       verbose=True):
+    """ Perform a forward-backward feature selection 
+    based on p-value from statsmodels.api.OLS
+    Arguments:
+        X - pandas.DataFrame with candidate features
+        y - list-like with the target
+        initial_list - list of features to start with (column names of X)
+        threshold_in - include a feature if its p-value < threshold_in
+        threshold_out - exclude a feature if its p-value > threshold_out
+        verbose - whether to print the sequence of inclusions and exclusions
+    Returns: list of selected features 
+    Always set threshold_in < threshold_out to avoid infinite looping.
+    See https://en.wikipedia.org/wiki/Stepwise_regression for the details """
+    
+    included = list(initial_list)
+    while True:
+        changed=False
+        # forward step
+        excluded = list(set(X.columns)-set(included))
+        new_pval = pd.Series(index=excluded)
+        for new_column in excluded:
+            model = sm.OLS(y, sm.add_constant(pd.DataFrame(X[included+[new_column]]))).fit()
+            new_pval[new_column] = model.pvalues[new_column]
+        best_pval = new_pval.min()
+        if best_pval < threshold_in:
+            best_feature = new_pval.idxmin()
+            included.append(best_feature)
+            changed=True
+            if verbose:
+                print('Add  {:30} with p-value {:.6}'.format(best_feature, best_pval))
+
+        # backward step
+        model = sm.OLS(y, sm.add_constant(pd.DataFrame(X[included]))).fit()
+        # use all coefs except intercept
+        pvalues = model.pvalues.iloc[1:]
+        worst_pval = pvalues.max() # null if pvalues is empty
+        if worst_pval > threshold_out:
+            changed=True
+            worst_feature = pvalues.idxmax()
+            included.remove(worst_feature)
+            if verbose:
+                print('Drop {:30} with p-value {:.6}'.format(worst_feature, worst_pval))
+        if not changed:
+            break
+    return included
+```
+The output is a list of the indices for the columns (features) that are added by the function. The added variables are the new set of variables that will be used for regression. Both sets of features are used for linear regression, and based on the mean absolute error, we found that the model performed significantly better on the new set of variables. 
+
+
+### Results
+
+
+| Model                   | Alpha     | MAE |
+|--------------------------------|-----------|--------------------|
+| Linear Model                   |      0.15 | $4027.26          |
+| Stepwise Selection             |      0.15 | $3509.20          |
+| Ridge                          |           | $2187.94           |                     
+| Lasso                          |      0.11 | $2210.72           |    
+| Elastic Net                    |      0.15 | $2170.19          |
+| SCAD                           |      0.15 | $2138.61          |
+| Square Root Lasso              |      0.15 | $2170.19          |
+

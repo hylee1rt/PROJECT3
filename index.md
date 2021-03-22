@@ -351,7 +351,7 @@ for idxtrain, idxtest in kf.split(X):
   mae_xgb.append(mean_absolute_error(y_test, yhat_xgb))
 print("Validated MAE XGBoost Regression = ${:,.2f}".format(1000*np.mean(mae_xgb)))
 ```
-# Neural Network
+# Neural Networks
 
 Neural networks are a set of algorithms, modeled after the human brain, that are designed to recognize recognize hidden patterns and correlations in raw data, cluster and classify it, and – over time – continuously learn and improve. Machine learning algorithms that use neural networks generally do not need to be programmed with specific rules that define what to expect from the input. The neural net learning algorithm instead learns from processing many labeled examples that are supplied during training and using this answer key to learn what characteristics of the input are needed to construct the correct output estimates. 
 

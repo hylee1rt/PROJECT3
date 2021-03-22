@@ -1,4 +1,4 @@
-The goal of this project is to compile and apply different models and methods for nonlinear regression on the Boston Housing Prices dataset. This analysis will cover regularization techniques on polynomial features, other nonlinear models, hyperparameter tuning and model validation. 
+In machine learning experiments the relationship between the dependent and independent variable is often assumed as linear. Often, the input features for a predictive modeling task interact in unexpected and often nonlinear ways. Creating new polynomial features sometimes might help in capturing that relationship which otherwise may go unnoticed. Thus, the goal of this project is to compile and apply different models and methods for nonlinear regression on the Boston Housing Prices dataset. This analysis will cover regularization techniques on polynomial features, other nonlinear models, hyperparameter tuning and model validation. 
 
 
 ### Boston Housing Data
@@ -9,7 +9,7 @@ Let's First look at a heat map of the correlationa in the data. The colors of th
 
 # Regularized Regression on Polynomial Features
 
-To apply polynomial features to our linear models with different regularization algorithms, we will initialize standard scalar to scale our data and polynomial features to transform our data.
+To apply polynomial features to our linear models with different regularization algorithms, we will initialize standard scalar to scale our data and polynomial features to transform our data. Once we transform our data into polynomial features by fitting our data on the polynomial features object, we can see how the models perform on the new dataset. 
 
 ```python
 scale = StandardScaler()
@@ -387,4 +387,7 @@ n_estimators=100,reg_lambda=20,alpha=1,gamma=10,max_depth=3
 
 
 
+# Conclusion 
+
+We have now explored different regularization techniques on polynomial feaatures and why and when are they applied. Applying regularization techniques makes sure that unimportant features are dropped (leading to a reduction of overfitting) and multicollinearity is reduced. Different regularization techniques used different cost functions to calculate the coefficients, and we saw how those coefficients changed with different values of *a*. The idea behind regularization is that models that overfit the data are complex models that have too many parameters, so we looked at tuning those parameters and using methods to search for the values that give us the lowest mean absolute errors. Other advanced methods of estimating the value of hyperparameters include particle swarm optimization and simulated annealing. 
 

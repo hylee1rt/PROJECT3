@@ -153,6 +153,9 @@ def DoKFoldScad(X,y,lam,a,k):
     PE.append(MAE(y_test,yhat_scad))
   return 1000*np.mean(PE)
 ```
+The plot below visualizes the mean absolute error for each alpha value along the defined alpha range.
+
+![download (2)](https://user-images.githubusercontent.com/66886936/111989632-66ff8680-8ae8-11eb-8b31-667c1ec1dce8.png)
 
 
 
@@ -392,8 +395,6 @@ print("MAE Neural Network = ${:,.2f}".format(1000*mae_nn))
 | XGBoost                        | n_estimators=100,lambda=20, alpha=1,gamma=10,max_depth=3 | $2313.58          |                     
 | Neural Network                 | validation_split=0.3, epochs=1000, batch_size=100  |$2476.62          |    
 
-
-n_estimators=100,reg_lambda=20,alpha=1,gamma=10,max_depth=3
 
 
 

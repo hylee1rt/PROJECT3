@@ -273,9 +273,9 @@ The output is a list of the indices for the columns (features) that are added by
 
 
 # Results
-With manually inputed alpha values, we can see that the performance of our regularization techniques and the square root lasso model are quite competitive. Although the mean absolute error for the linear model and stepwise selection is higher than our regularization models, the stepwise variable selection method improved our normal linear model's mean absolute error. All of these models have been cross-validated by k-fold validation. 
+With manually inputed alpha values, we can see that the performance of our regularization techniques and the square root lasso model are quite competitive. Although the mean absolute error for the linear model and stepwise selection is higher than our regularization models, the stepwise variable selection method improved our normal linear model's mean absolute error. All of these models have been cross-validated by k-fold validation.
 
-| Model                          | Alpha     | MAE                |
+| Model                          | Alpha     | Validated MAE       
 |--------------------------------|-----------|--------------------|
 | Linear Model                   |           | $4027.26          |
 | Stepwise Selection             |           | $3509.20          |
@@ -292,7 +292,7 @@ Now, let's see if tuning the hyperparameters improve our results even further.
 
 Grid Search is an effective method for adjusting the parameters in supervised learning and improve the generalization performance of a model. With Grid Search, we try all possible combinations of the parameters of interest and find the best ones.
 
-| GridSearchCV                   | Alpha     | MAE |
+| GridSearchCV                   | Alpha     | Validated MAE      |
 |--------------------------------|-----------|--------------------|
 | Ridge                          |     66.87 | $3776.09           |                     
 | Lasso                          |      0.11 | $3887.78          |    
@@ -307,13 +307,79 @@ In kernel regression, each of the kernels use their functions to determine the w
 
 
 
-
-
-
 # Random Forest and XGBoost 
 
 Random Forest is a classification model that consists of multiple, independent decision trees. XGBoost is also a decision-tree-based algorithm that uses an advanced implementation of gradient boosting and regularization framework for speed and performance. It can best be used to solve structured data such as regression, classification, ranking, and user-defined prediction problems. XGBoost focuses on minimizing the errors to turn weak learners into strong learners and "boost" performance.
 
+```python
+kf = KFold(n_splits=10, shuffle=True, random_state=1234)
+rf = RandomForestRegressor(n_estimators=1000,max_depth=3)
+mae_rf = []
 
+for idxtrain, idxtest in kf.split(X):
+  X_train = X[idxtrain,:]
+  y_train = y[idxtrain]
+  X_test  = X[idxtest,:]
+  y_test  = y[idxtest]
+  rf.fit(X_train,y_train.ravel())
+  yhat_rf = rf.predict(X_test)
+  mae_rf.append(MAE(y_test, yhat_rf))
+print("Validated MAE RF = ${:,.2f}".format(1000*np.mean(mae_rf)))
+```
+
+```python
+model_xgb = xgb.XGBRegressor(objective ='reg:squarederror',n_estimators=100,reg_lambda=20,alpha=1,gamma=10,max_depth=3)
+mae_xgb = []
+
+for idxtrain, idxtest in kf.split(X):
+  X_train = X[idxtrain,:]
+  y_train = y[idxtrain]
+  X_test  = X[idxtest,:]
+  y_test  = y[idxtest]
+  model_xgb.fit(X_train,y_train)
+  yhat_xgb = model_xgb.predict(X_test)
+  mae_xgb.append(mean_absolute_error(y_test, yhat_xgb))
+print("Validated MAE XGBoost Regression = ${:,.2f}".format(1000*np.mean(mae_xgb)))
+```
+# Neural Network
+
+Neural networks are a set of algorithms, modeled after the human brain, that are designed to recognize recognize hidden patterns and correlations in raw data, cluster and classify it, and – over time – continuously learn and improve. Machine learning algorithms that use neural networks generally do not need to be programmed with specific rules that define what to expect from the input. The neural net learning algorithm instead learns from processing many labeled examples that are supplied during training and using this answer key to learn what characteristics of the input are needed to construct the correct output estimates. 
+
+
+```python
+import keras
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Dropout
+from sklearn.metrics import r2_score
+from keras.optimizers import Adam
+from keras.callbacks import EarlyStopping
+```
+```python
+model = Sequential()
+model.add(Dense(128, activation="relu", input_dim=11))
+model.add(Dense(32, activation="relu"))
+model.add(Dense(8, activation="relu"))
+# Since the regression is performed, a Dense layer containing a single neuron with a linear activation function.
+# Typically ReLu-based activation are used but since it is performed regression, it is needed a linear activation.
+model.add(Dense(1, activation="linear"))
+model.compile(loss='mean_squared_error', optimizer=Adam(lr=1e-3, decay=1e-3 / 200))
+es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=800)
+history = model.fit(dat_train[:,:-1], dat_train[:,11], validation_split=0.3, epochs=1000, batch_size=100, verbose=0, callbacks=[es])
+```
+```python
+yhat_nn = model.predict(dat_test[:,:-1])
+mae_nn = mean_absolute_error(dat_test[:,-1], yhat_nn)
+print("MAE Neural Network = ${:,.2f}".format(1000*mae_nn))
+```
+
+# Results
+
+| Model                          |  Validated MAE     |  
+|--------------------------------|--------------------|
+| Kernel Regressions             | $2854.57           |
+| Random Forest Regression       | $2877.17           |
+| XGBoost                        |  $2313.58          |                     
+| Neural Network                 |  $2476.62          |    
 
 

@@ -16,6 +16,8 @@ scale = StandardScaler()
 poly = PolynomialFeatures(degree=3)
 ```
 
+### K-fold cross-validation 
+
 Then we define a general function *DoKFold_SK* that will take the model as a parameter (which will be one of the regularization models) and return the average MAE of each of the k-folds. The k-fold cross-validation a resampling procedure used to evaluate machine learning models on a limited data sample. It splits the data into *k* equal groups, and uses each group once as the test data while the rest is used as training data. By averaging many 'trials,' it gives us a more accurate estimate of our mean absolute error.
 
 ```python
@@ -212,7 +214,7 @@ def DoKFoldSqrt(X,y,a,k,d):
 ```
 
 
-### Stepwise selection
+# Stepwise Selection
 
 Stepwise selection is a combination of the forward and backward variable selection techniques and was originally developed as a feature selection technique for linear regression models. The forward stepwise regression approach uses a sequence of steps to allow features to be added or dropped one at a time. The add and drop criteria is commonly based on a p-value threshold. Typically, a p-value must be less than 0.15 for a feature to enter the model and must be greater than 0.15 for a feature to leave the model. The function is defined below. 
 
@@ -270,16 +272,43 @@ def stepwise_selection(X, y,
 The output is a list of the indices for the columns (features) that are added by the function. The added variables are the new set of variables that will be used for regression. Both sets of features are used for linear regression, and based on the mean absolute error, we found that the model performed significantly better on the new set of variables. 
 
 
-### Results
+# Results
+With manually inputed alpha values, we can see that the performance of our regularization techniques and the square root lasso model are quite competitive. Although the mean absolute error for the linear model and stepwise selection is higher than our regularization models, the stepwise variable selection method improved our normal linear model's mean absolute error. All of these models have been cross-validated by k-fold validation. 
 
-
-| Model                   | Alpha     | MAE |
+| Model                          | Alpha     | MAE                |
 |--------------------------------|-----------|--------------------|
-| Linear Model                   |      0.15 | $4027.26          |
-| Stepwise Selection             |      0.15 | $3509.20          |
-| Ridge                          |           | $2187.94           |                     
-| Lasso                          |      0.11 | $2210.72           |    
-| Elastic Net                    |      0.15 | $2170.19          |
-| SCAD                           |      0.15 | $2138.61          |
-| Square Root Lasso              |      0.15 | $2170.19          |
+| Linear Model                   |           | $4027.26          |
+| Stepwise Selection             |           | $3509.20          |
+| Ridge                          |        20 | $2187.94           |                     
+| Lasso                          |      0.05 | $2210.72           |    
+| Elastic Net                    |      0.05 | $2170.19          |
+| SCAD                           |      0.15 | $2638.63          |
+| Square Root Lasso              |      0.01 | $2138.62          |
+
+
+Now, let's see if tuning the hyperparameters improve our results even further. 
+
+### GridSearchCV
+
+Grid Search is an effective method for adjusting the parameters in supervised learning and improve the generalization performance of a model. With Grid Search, we try all possible combinations of the parameters of interest and find the best ones.
+
+| GridSearchCV                   | Alpha     | MAE |
+|--------------------------------|-----------|--------------------|
+| Ridge                          |     66.87 | $3776.09           |                     
+| Lasso                          |      0.11 | $3887.78          |    
+| Elastic Net                    |      0.15 | $3820.86          |   
+
+
+
+
+# Kernel Weighted Regressions
+
+In kernel regression, each of the kernels use their functions to determine the weights of our data points for our locally weighted regression. Kernel weighted regressions work well for data that does not show linear qualities. The weights are typically obtained by applying a distance-based kernel function to each of the samples. The LOWESS model performs linear regressions on subsets of data that is weighted by a kernel function.
+
+
+
+
+
+# Random Forest and XGBoost 
+
 

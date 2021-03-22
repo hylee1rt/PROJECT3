@@ -299,6 +299,16 @@ Grid Search is an effective method for adjusting the parameters in supervised le
 | Elastic Net                    |      0.01 | $2846.91          |   
 
 
+# RandomizedSearchCV
+
+In the grid search approach, every combination of hyperparameter values is tried which can be very inefficient. RandomizedSearchCV is very useful when we have many parameters to try and the training time is very long. Random Search sets up a grid of hyperparameter values and selects random combinations to train the model and score. That means that not all parameter values are tried out, but rather a fixed number of parameter settings is sampled from the specified distributions. The number of parameter settings that are tried is given by n_iter.This allows you to explicitly control the number of parameter combinations that are attempted. The number of search iterations is set based on time or resources. Scikit Learn offers the RandomizedSearchCV function for this process.
+
+
+| Model                          | Alpha      | Validated MAE      |
+|--------------------------------|-----------|--------------------|
+| Ridge                          |      5.59 | $2856.19           |                     
+| Lasso                          |      0.03 | $2957.36          |    
+| Elastic Net                    |      0.03 | $2931.43          |   
 
 
 # Kernel Weighted Regressions
@@ -389,5 +399,5 @@ n_estimators=100,reg_lambda=20,alpha=1,gamma=10,max_depth=3
 
 # Conclusion 
 
-We have now explored different regularization techniques on polynomial feaatures and why and when are they applied. Applying regularization techniques makes sure that unimportant features are dropped (leading to a reduction of overfitting) and multicollinearity is reduced. Different regularization techniques used different cost functions to calculate the coefficients, and we saw how those coefficients changed with different values of *a*. The idea behind regularization is that models that overfit the data are complex models that have too many parameters, so we looked at tuning those parameters and using methods to search for the values that give us the lowest mean absolute errors. Other advanced methods of estimating the value of hyperparameters include particle swarm optimization and simulated annealing. 
+We have now explored how different regularization techniques perform on polynomial feaatures. We also implemented the stepwise selection, which is a method of variable selection that filters out unimportant variables. Applying variable selection and regularization techniques makes sure that unimportant features are dropped (leading to a reduction of overfitting) and multicollinearity is reduced. We used k-fold cross validation on *k* (number of folds = 10 in this project) different splits of the data to ensure consistency and validity of the models. Since the idea behind regularization is that models that overfit the data are complex models that have too many parameters, so we looked at tuning those parameters and using methods to search for the values that give us the lowest mean absolute errors. Gridsearch was one method of locating the optimal alpha value. Other advanced methods of estimating the value of hyperparameters include particle swarm optimization and simulated annealing. 
 

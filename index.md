@@ -299,7 +299,7 @@ Grid Search is an effective method for adjusting the parameters in supervised le
 | Elastic Net                    |      0.01 | $2846.91          |   
 
 
-# RandomizedSearchCV
+### RandomizedSearchCV
 
 In the grid search approach, every combination of hyperparameter values is tried which can be very inefficient. RandomizedSearchCV is very useful when we have many parameters to try and the training time is very long. Random Search sets up a grid of hyperparameter values and selects random combinations to train the model and score. That means that not all parameter values are tried out, but rather a fixed number of parameter settings is sampled from the specified distributions. The number of parameter settings that are tried is given by n_iter.This allows you to explicitly control the number of parameter combinations that are attempted. The number of search iterations is set based on time or resources. Scikit Learn offers the RandomizedSearchCV function for this process.
 

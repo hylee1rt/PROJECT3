@@ -9,12 +9,18 @@ Let's First look at a heat map of the correlationa in the data. The colors of th
 
 # Regularized Regression on Polynomial Features
 
+Let's say our data looked like this and we want to fit a regression model: 
+<img width="753" alt="download (3)" src="https://user-images.githubusercontent.com/66886936/111995853-c9a85080-8aef-11eb-9277-707d9d1874cf.png">
+Here, degrees 3 or higher can fit the pattern quite nicely. However, we do not want to risk overfitting the model by defining a high degree that will try to fit the data too closely on these limited data points. This will cause our models to have high internal validity, but low external validity, which will not be helpful in our applications. We can choose degree 2 first and increase as you see how the model adjusts. For this project, we will be using polynomial features of degree 3. 
+
 To apply polynomial features to our linear models with different regularization algorithms, we will initialize standard scalar to scale our data and polynomial features to transform our data. Once we transform our data into polynomial features by fitting our data on the polynomial features object, we can see how the models perform on the new dataset. 
 
 ```python
 scale = StandardScaler()
 poly = PolynomialFeatures(degree=3)
 ```
+
+
 
 ### K-fold cross-validation 
 
@@ -387,6 +393,8 @@ print("MAE Neural Network = ${:,.2f}".format(1000*mae_nn))
 ```
 
 # Results
+According to our results, we see that XGBoost and neural network algorithms performed the best, and for this instance, XGBoost had the lowest mean absolute error. Whie competitive, the results from the two models are still slightly higher than the mean absolute errors from our regularized models on polynomial regression. One thing that we can note here is that while the regularized regressions on polynomial features had the best results, we must be careful about overfitting our models. Visualing the curve on a scatter plot of the data can help avoid overfitting. 
+
 
 | Model                          | Parameters |  Validated MAE     |  
 |--------------------------------|------------|--------------------|

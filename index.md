@@ -24,7 +24,7 @@ poly = PolynomialFeatures(degree=3)
 
 ### K-fold cross-validation 
 
-Then we define a general function *DoKFold_SK* that will take the model as a parameter (which will be one of the regularization models) and return the average MAE of each of the k-folds. The k-fold cross-validation a resampling procedure used to evaluate machine learning models on a limited data sample. It splits the data into *k* equal groups, and uses each group once as the test data while the rest is used as training data. By averaging many 'trials,' it gives us a more accurate estimate of our mean absolute error.
+Then we define a general function *DoKFold_SK* that will take the model as a parameter (which will be one of the regularization models) and return the average MAE of each of the k-folds. The ***k-fold cross-validation*** a resampling procedure used to evaluate machine learning models on a limited data sample. It splits the data into *k* equal groups, and uses each group once as the test data while the rest is used as training data. By averaging many 'trials,' it gives us a more accurate estimate of our mean absolute error.
 
 ```python
 def DoKFold_SK(X,y,model,k):

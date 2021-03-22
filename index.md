@@ -294,8 +294,8 @@ Grid Search is an effective method for adjusting the parameters in supervised le
 
 | GridSearchCV                   | Alpha     | Validated MAE      |
 |--------------------------------|-----------|--------------------|
-| Ridge                          |     66.87 | $3776.09           |                     
-| Lasso                          |      0.11 | $3887.78          |    
+| Ridge                          |     6.22  | $2855.70           |                     
+| Lasso                          |      0.03 | $2948.42         |    
 | Elastic Net                    |      0.15 | $3820.86          |   
 
 
@@ -303,7 +303,7 @@ Grid Search is an effective method for adjusting the parameters in supervised le
 
 # Kernel Weighted Regressions
 
-In kernel regression, each of the kernels use their functions to determine the weights of our data points for our locally weighted regression. Locally weighted regresssions are non-parametric regression methods that combine multiple regression models in a k-nearest-neighbor-based meta-model. They are used to fit simple models to localized subsets of the data to build up a function that describes the variation in the data. Weights applied to each point help identify regions that contribute more heavily to the model, and the different kernels apply different weights to each point. Kernel weighted regressions work well for data that does not show linear qualities. The weights are typically obtained by applying a distance-based kernel function to each of the samples. The LOWESS model performs linear regressions on subsets of data that is weighted by a kernel function. 
+In kernel regression, each of the kernels use their functions to determine the weights of our data points for our locally weighted regression. Locally weighted regresssions are non-parametric regression methods that combine multiple regression models in a k-nearest-neighbor-based meta-model. They are used to fit simple models to localized subsets of the data to build up a function that describes the variation in the data. Weights applied to each point help identify regions that contribute more heavily to the model, and the different kernels apply different weights to each point. Kernel weighted regressions work well for data that does not show linear qualities. The weights are typically obtained by applying a distance-based kernel function to each of the samples. 
 
 
 

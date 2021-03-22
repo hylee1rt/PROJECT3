@@ -275,27 +275,27 @@ The output is a list of the indices for the columns (features) that are added by
 # Results
 With manually inputed alpha values, we can see that the performance of our regularization techniques and the square root lasso model are quite competitive. Although the mean absolute error for the linear model and stepwise selection is higher than our regularization models, the stepwise variable selection method improved our normal linear model's mean absolute error. All of these models have been cross-validated by k-fold validation.
 
-| Model                          | Alpha     | Validated MAE       
+| Model                          | Parameters     | Validated MAE       
 |--------------------------------|-----------|--------------------|
 | Linear Model                   |           | $4027.26          |
 | Stepwise Selection             |           | $3509.20          |
-| Ridge                          |        20 | $2187.94           |                     
-| Lasso                          |      0.05 | $2210.72           |    
-| Elastic Net                    |      0.05 | $2170.19          |
-| SCAD                           |      0.15 | $2638.63          |
-| Square Root Lasso              |      0.01 | $2138.62          |
+| Ridge                          |      a=20 | $2187.94           |                     
+| Lasso                          |      a=0.05 | $2210.72           |    
+| Elastic Net                    |a=0.05, ratio=0.25 | $2170.19          |
+| SCAD                           |      a=0.15 | $2638.63          |
+| Square Root Lasso              |      a=0.01 | $2138.62          |
 
 
 Now, let's see if tuning the hyperparameters improve our results even further. 
 
 ### GridSearchCV
 
-Grid Search is an effective method for adjusting the parameters in supervised learning and improve the generalization performance of a model. With Grid Search, we try all possible combinations of the parameters of interest and find the best ones.
+Grid Search is an effective method for adjusting the parameters in supervised learning and improve the generalization performance of a model. With Grid Search, we try all possible combinations of the parameters of interest and find the best ones. Although this algorithm is supposed to help up locate the best hyperparameter, it did not necessarily yield better results. This could be due to the fact that the linspace generated *num* number of samples in the given range, and there could have been better alpha values that were skipped over. 
 
 | Model                          | Alpha      | Validated MAE      |
 |--------------------------------|-----------|--------------------|
-| Ridge                          |     6.22  | $2855.70           |                     
-| Lasso                          |      0.03 | $2948.42         |    
+| Ridge                          |      6.22 | $2855.70           |                     
+| Lasso                          |      0.03 | $2948.42          |    
 | Elastic Net                    |      0.01 | $2846.91          |   
 
 
@@ -375,15 +375,15 @@ print("MAE Neural Network = ${:,.2f}".format(1000*mae_nn))
 
 # Results
 
-| Model                          |  Validated MAE     |  
-|--------------------------------|--------------------|
-| Gaussian Kernel Regression     | $2854.57           |
-| Random Forest Regression       | $2877.17           |
-| XGBoost                        |  $2313.58          |                     
-| Neural Network                 |  $2476.62          |    
+| Model                          | Parameters |  Validated MAE     |  
+|--------------------------------|------------|--------------------|
+| Gaussian Kernel Regression     |             |$2854.57           |
+| Random Forest Regression       | n_estimators=100, max_depth=3 |$2877.17           |
+| XGBoost                        | n_estimators=100,lambda=20, alpha=1,gamma=10,max_depth=3 | $2313.58          |                     
+| Neural Network                 | validation_split=0.3, epochs=1000, batch_size=100  |$2476.62          |    
 
 
-
+n_estimators=100,reg_lambda=20,alpha=1,gamma=10,max_depth=3
 
 
 
